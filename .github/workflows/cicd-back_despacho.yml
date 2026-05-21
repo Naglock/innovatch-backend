@@ -49,6 +49,8 @@ jobs:
               -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e DB_PORT=3306 \
+              -e DB_NAME=despacho_db \
               ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest"
           ]}' \
           --output text

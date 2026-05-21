@@ -10,11 +10,11 @@ services:
     environment:
       DB_ENDPOINT: ${DB_HOST_IP:-127.0.0.1}
       DB_PORT: 3306
-      DB_NAME: devops_db
-      DB_USERNAME: admin
+      DB_NAME: ventas_db
+      DB_USERNAME: ${DB_USERNAME:-admin}
       DB_PASSWORD: ${DB_PASSWORD:-root}
+    restart: unless-stopped
 
-  # Tu Backend de Despachos
   back-despachos:
     build:
       context: ./back-despachos
@@ -24,6 +24,7 @@ services:
     environment:
       DB_ENDPOINT: ${DB_HOST_IP:-127.0.0.1}
       DB_PORT: 3306
-      DB_NAME: devops_db
-      DB_USERNAME: admin
+      DB_NAME: despacho_db
+      DB_USERNAME: ${DB_USERNAME:-admin}
       DB_PASSWORD: ${DB_PASSWORD:-root}
+    restart: unless-stopped
