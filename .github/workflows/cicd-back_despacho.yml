@@ -30,8 +30,8 @@ jobs:
         # Entramos a la carpeta específica de tu servicio
         cd back-despachos
         docker build -t backend-despachos .
-        docker tag backend-despachos:latest ${{ secrets.ECR_REPO_URL_BACK_DESPACHOS }}:latest
-        docker push ${{ secrets.ECR_REPO_URL_BACK_DESPACHOS }}:latest
+        docker tag backend-despachos:latest ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest
+        docker push ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest
 
     - name: Desplegar Backend vía SSM en EC2
       run: |
@@ -42,13 +42,13 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REPO_URL_BACK_DESPACHOS }}:latest",
+            "docker pull ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest",
             "docker stop backend-despachos || true",
             "docker rm backend-despachos || true",
             "docker run -d --name backend-despachos -p 8081:8081 \
               -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              ${{ secrets.ECR_REPO_URL_BACK_DESPACHOS }}:latest"
+              ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest"
           ]}' \
           --output text
