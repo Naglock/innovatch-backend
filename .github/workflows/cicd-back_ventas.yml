@@ -1,0 +1,53 @@
+name: CI/CD Innovatech - Backend Ventas
+
+on:
+  push:
+    branches: [ "deploy" ]
+    paths:
+      - "back-ventas/**"
+
+jobs:
+  build-push-deploy-ventas:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Configurar credenciales AWS
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Login en Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build imagen Backend Ventas y push a ECR
+      run: |
+        # Entramos a la carpeta de Ventas
+        cd back-ventas
+        docker build -t backend-ventas .
+        docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_VENTAS }}:latest
+        docker push ${{ secrets.ECR_REPO_URL_VENTAS }}:latest
+
+    - name: Desplegar Backend Ventas vía SSM en EC2
+      run: |
+        aws ssm send-command \
+          --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
+          --document-name "AWS-RunShellScript" \
+          --comment "Actualizar backend-ventas desde ECR" \
+          --parameters '{"commands":[
+            "set -e",
+            "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+            "docker pull ${{ secrets.ECR_REPO_URL_VENTAS }}:latest",
+            "docker stop backend-ventas || true",
+            "docker rm backend-ventas || true",
+            "docker run -d --name backend-ventas -p 8080:8080 \
+              -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              ${{ secrets.ECR_REPO_URL_VENTAS }}:latest"
+          ]}' \
+          --output text
