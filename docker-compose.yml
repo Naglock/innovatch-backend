@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  back-ventas:
+    build:
+      context: ./back-ventas
+    container_name: api-ventas
+    ports:
+      - "8080:8080"
+    environment:
+      DB_ENDPOINT: ${DB_HOST_IP:-127.0.0.1}
+      DB_PORT: 3306
+      DB_NAME: devops_db
+      DB_USERNAME: admin
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+
+  # Tu Backend de Despachos
+  back-despachos:
+    build:
+      context: ./back-despachos
+    container_name: api-despachos
+    ports:
+      - "8081:8081"
+    environment:
+      DB_ENDPOINT: ${DB_HOST_IP:-127.0.0.1}
+      DB_PORT: 3306
+      DB_NAME: devops_db
+      DB_USERNAME: admin
+      DB_PASSWORD: ${DB_PASSWORD:-root}
