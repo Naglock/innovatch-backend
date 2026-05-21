@@ -30,8 +30,8 @@ jobs:
         # Entramos a la carpeta de Ventas
         cd back-ventas
         docker build -t backend-ventas .
-        docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_VENTAS }}:latest
-        docker push ${{ secrets.ECR_REPO_URL_VENTAS }}:latest
+        docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest
+        docker push ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest
 
     - name: Desplegar Backend Ventas vía SSM en EC2
       run: |
@@ -42,12 +42,12 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REPO_URL_VENTAS }}:latest",
+            "docker pull ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest",
             "docker stop backend-ventas || true",
             "docker rm backend-ventas || true",
             "docker run -d --name backend-ventas -p 8080:8080 \
               -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              ${{ secrets.ECR_REPO_URL_VENTAS }}:latest"
+              ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest"
           ]}' \
           --output text
