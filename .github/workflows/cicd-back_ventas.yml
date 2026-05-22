@@ -27,7 +27,6 @@ jobs:
 
     - name: Build imagen Backend Ventas y push a ECR
       run: |
-        # Entramos a la carpeta de Ventas
         cd back-ventas
         docker build -t backend-ventas .
         docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest

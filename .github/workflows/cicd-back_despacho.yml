@@ -27,7 +27,6 @@ jobs:
 
     - name: Build imagen Backend Despachos y push a ECR
       run: |
-        # Entramos a la carpeta específica de tu servicio
         cd back-despachos
         docker build -t backend-despachos .
         docker tag backend-despachos:latest ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest
