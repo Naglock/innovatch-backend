@@ -30,8 +30,8 @@ jobs:
         # Entramos a la carpeta de Ventas
         cd back-ventas
         docker build -t backend-ventas .
-        docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest
-        docker push ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest
+        docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest
+        docker push ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest
 
     - name: Desplegar Backend Ventas vía SSM en EC2
       run: |
@@ -42,9 +42,9 @@ jobs:
           --parameters '{"commands":[
             "set -e",
             "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest",
+            "docker pull ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest",
             "docker stop backend-ventas || true",
             "docker rm backend-ventas || true",
-            "docker run -d --name backend-ventas -p 8080:8080 -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=3306 -e DB_NAME=ventas_db ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest"
+            "docker run -d --name backend-ventas -p 8080:8080 -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=3306 -e DB_NAME=ventas_db ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest"
           ]}' \
           --output text
