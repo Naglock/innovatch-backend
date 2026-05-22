@@ -45,12 +45,6 @@ jobs:
             "docker pull ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest",
             "docker stop backend-ventas || true",
             "docker rm backend-ventas || true",
-            "docker run -d --name backend-ventas -p 8080:8080 \
-              -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e DB_PORT=3306 \
-              -e DB_NAME=ventas_db \
-              ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest"
+            "docker run -d --name backend-ventas -p 8080:8080 -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=3306 -e DB_NAME=ventas_db ${{ secrets.ECR_REPO_URL_BACK_VENTAS }}:latest"
           ]}' \
           --output text
