@@ -32,18 +32,21 @@ jobs:
         docker tag backend-ventas:latest ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest
         docker push ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest
 
-    - name: Desplegar Backend Ventas vía SSM en EC2
-      run: |
-        aws ssm send-command \
-          --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
-          --document-name "AWS-RunShellScript" \
-          --comment "Actualizar backend-ventas desde ECR" \
-          --parameters '{"commands":[
-            "set -e",
-            "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest",
-            "docker stop backend-ventas || true",
-            "docker rm backend-ventas || true",
-            "docker run -d --name backend-ventas -v db_data_ventas:/var/lib/mysql -p 8080:8080 -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=3306 -e DB_NAME=ventas_db ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest"
-          ]}' \
-          --output text
+    # ---------------------------------------------------------------------------
+    # SECCIÓN DE DESPLIEGUE COMENTADA PARA LA EVALUACIÓN 3 (MIGRACIÓN A ECS)
+    # ---------------------------------------------------------------------------
+    # - name: Desplegar Backend Ventas vía SSM en EC2
+    #   run: |
+    #     aws ssm send-command \
+    #       --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
+    #       --document-name "AWS-RunShellScript" \
+    #       --comment "Actualizar backend-ventas desde ECR" \
+    #       --parameters '{"commands":[
+    #         "set -e",
+    #         "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+    #         "docker pull ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest",
+    #         "docker stop backend-ventas || true",
+    #         "docker rm backend-ventas || true",
+    #         "docker run -d --name backend-ventas -v db_data_ventas:/var/lib/mysql -p 8080:8080 -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} -e DB_PORT=3306 -e DB_NAME=ventas_db ${{ secrets.ECR_REPO_URL_BACK_VENTA }}:latest"
+    #       ]}' \
+    #       --output text
