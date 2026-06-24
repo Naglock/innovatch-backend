@@ -16,7 +16,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("api/v1/ventas")
+@RequestMapping("/api/v1/ventas")
 @Tag(name = "Venta", description = "Controlador para gestionar ventas")
 public class VentaController {
 

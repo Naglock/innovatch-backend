@@ -27,30 +27,15 @@ jobs:
 
     - name: Build imagen Backend Despachos y push a ECR
       run: |
-        # Entramos a la carpeta específica de tu servicio
         cd back-despachos
         docker build -t backend-despachos .
         docker tag backend-despachos:latest ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest
         docker push ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest
 
-    - name: Desplegar Backend vía SSM en EC2
+    - name: Desplegar Backend Despachos en ECS
       run: |
-        aws ssm send-command \
-          --instance-ids ${{ secrets.EC2_BACKEND_INSTANCE_ID }} \
-          --document-name "AWS-RunShellScript" \
-          --comment "Actualizar backend-despachos desde ECR" \
-          --parameters '{"commands":[
-            "set -e",
-            "aws ecr get-login-password --region '${{ secrets.AWS_REGION }}' | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
-            "docker pull ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest",
-            "docker stop backend-despachos || true",
-            "docker rm backend-despachos || true",
-            "docker run -d --name backend-despachos -p 8081:8081 \
-              -e DB_ENDPOINT=${{ secrets.DB_HOST_IP }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              -e DB_PORT=3306 \
-              -e DB_NAME=despacho_db \
-              ${{ secrets.ECR_REPO_URL_BACK_DESPACHO }}:latest"
-          ]}' \
-          --output text
+        aws ecs update-service \
+          --cluster innovatech-cluster \
+          --service servicio-despachos \
+          --force-new-deployment \
+          --region ${{ secrets.AWS_REGION }}
